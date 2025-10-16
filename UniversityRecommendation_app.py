@@ -15,7 +15,7 @@ st.set_page_config(
 )
 
 # 제목
-st.title("🎓 대학 자동 추천 시스템")
+st.title("🎓 코드스튜디오 입시연구소")
 st.markdown("### 2021~2025년 5개년 데이터 기반 맞춤 추천")
 st.markdown("---")
 
