@@ -9,7 +9,7 @@ import re
 
 # 페이지 설정
 st.set_page_config(
-    page_title="코드시튜디오 입시연구소",
+    page_title="코드스튜디오 입시연구소",
     page_icon="🎓",
     layout="wide"
 )
