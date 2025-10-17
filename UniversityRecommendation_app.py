@@ -574,7 +574,7 @@ def find_recommendations(df, major_keyword, student_grade, num_results=30):
 def create_excel_output(student_info, recommendations, all_results_df=None):
     """엑셀 파일 생성 - 추천 결과 + 전체 검색 결과"""
     from openpyxl import Workbook
-    from openpyxl.styles import Font, PatternFill, Alignment
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
     import pandas as pd
     
     wb = Workbook()
@@ -583,27 +583,52 @@ def create_excel_output(student_info, recommendations, all_results_df=None):
     ws1 = wb.active
     ws1.title = "학교추천"
     
-    header_fill = PatternFill(start_color="FF6B35", end_color="FF6B35", fill_type="solid")
-    header_font = Font(bold=True, color="FFFFFF", size=12)
+    # 주황색 헤더 스타일 정의
+    orange_fill = PatternFill(start_color="FF8C00", end_color="FF8C00", fill_type="solid")
+    white_font = Font(bold=True, color="FFFFFF", size=11)
+    black_font = Font(size=11)
+    center_align = Alignment(horizontal='center', vertical='center')
+    thin_border = Border(left=Side(style='thin'), right=Side(style='thin'), 
+                        top=Side(style='thin'), bottom=Side(style='thin'))
     
-    ws1['A1'] = "학교명"
+    # 1행 - 학교 정보 헤더
+    headers_row1 = [
+        ('A1', '학교명', orange_fill, white_font),
+        ('C1', '학년', orange_fill, white_font),
+        ('E1', '이름', orange_fill, white_font),
+        ('G1', '희망진로', orange_fill, white_font)
+    ]
+    
+    for cell_addr, value, fill, font in headers_row1:
+        cell = ws1[cell_addr]
+        cell.value = value
+        cell.fill = fill
+        cell.font = font
+        cell.alignment = center_align
+        cell.border = thin_border
+    
+    # 1행 - 학교 정보 데이터
     ws1['B1'] = student_info['school']
-    ws1['C1'] = "학년"
     ws1['D1'] = student_info['grade']
-    ws1['E1'] = "이름"
     ws1['F1'] = student_info['name']
-    ws1['G1'] = "희망진로"
     ws1['H1'] = student_info['major']
     
-    headers = ['학교', '학과명', '전형', '전형요소', '구분', '최근70%컷', '데이터년수', '평균경쟁률']
-    for idx, header in enumerate(headers, start=1):
+    # 병합할 셀들 (희망진로는 3개 셀 병합)
+    ws1.merge_cells('H1:J1')
+    
+    # 3행 - 테이블 헤더
+    headers_row3 = ['학교', '학과명', '전형', '전형요소', '구분', '최근70%컷', '데이터년수', '평균경쟁률']
+    for idx, header in enumerate(headers_row3, start=1):
         cell = ws1.cell(row=3, column=idx)
         cell.value = header
-        cell.fill = header_fill
-        cell.font = header_font
-        cell.alignment = Alignment(horizontal='center', vertical='center')
+        cell.fill = orange_fill
+        cell.font = white_font
+        cell.alignment = center_align
+        cell.border = thin_border
     
+    # 4행부터 데이터 입력
     for idx, rec in enumerate(recommendations, start=4):
+        # 데이터 입력
         ws1[f'A{idx}'] = rec['university']
         ws1[f'B{idx}'] = rec['major']
         ws1[f'C{idx}'] = rec['admission_type']
@@ -613,22 +638,35 @@ def create_excel_output(student_info, recommendations, all_results_df=None):
         ws1[f'G{idx}'] = f"{rec.get('years_data', 1)}년"
         ws1[f'H{idx}'] = f"{rec.get('comp_rate', '-'):.1f}" if rec.get('comp_rate') else "-"
         
+        # 모든 셀에 테두리와 정렬 적용
+        for col in range(1, 9):  # A부터 H까지
+            cell = ws1.cell(row=idx, column=col)
+            cell.border = thin_border
+            cell.alignment = center_align
+            cell.font = black_font
+        
+        # 구분 셀 색상 적용
         category_colors = {
-            '강상향': 'FFCCCC', '상향': 'FFE0CC', '약상향': 'FFF4CC',
-            '적정': 'CCFFCC', '강적정': 'CCFFE5', '안정': 'CCE5FF', 
-            '강안정': 'CCCCFF', '정보없음': 'F0F0F0'
+            '강상향': 'FF9999', '상향': 'FFB366', '약상향': 'FFCC66',
+            '적정': '99FF99', '강적정': '66FFB3', '안정': '99CCFF', 
+            '강안정': '9999FF', '정보없음': 'E6E6E6'
         }
         
         color = category_colors.get(rec['category'], 'FFFFFF')
         ws1[f'E{idx}'].fill = PatternFill(start_color=color, end_color=color, fill_type="solid")
+        
+        # 평균경쟁률 셀도 연한 회색으로
+        ws1[f'H{idx}'].fill = PatternFill(start_color="F0F0F0", end_color="F0F0F0", fill_type="solid")
     
-    ws1.column_dimensions['A'].width = 20
+    # 열 너비 조정
+    ws1.column_dimensions['A'].width = 15
     ws1.column_dimensions['B'].width = 30
     ws1.column_dimensions['C'].width = 15
-    ws1.column_dimensions['D'].width = 25
+    ws1.column_dimensions['D'].width = 20
     ws1.column_dimensions['E'].width = 12
-    ws1.column_dimensions['F'].width = 12
+    ws1.column_dimensions['F'].width = 15
     ws1.column_dimensions['G'].width = 12
+    ws1.column_dimensions['H'].width = 15
     
     # === 두 번째 시트: 전체 검색 결과 ===
     if all_results_df is not None:
@@ -873,7 +911,7 @@ def main():
         st.download_button(
             "📥 엑셀 파일 다운로드",
             output_file,
-            f"대학추천_{st.session_state['student_info']['name']_by_CodeStudio.xlsx",
+            f"대학추천_{st.session_state['student_info']['name']}_by_COdeStudio.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             use_container_width=True
         )
