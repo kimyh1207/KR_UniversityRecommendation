@@ -14,9 +14,77 @@ st.set_page_config(
     layout="wide"
 )
 
+# 세션 상태 초기화
+if 'authenticated' not in st.session_state:
+    st.session_state.authenticated = False
+    st.session_state.user = None
+
+# 라이센스 체크 함수
+def check_license():
+    """라이센스 확인"""
+    try:
+        licenses = st.secrets["licenses"]
+        return licenses
+    except KeyError:
+        return None
+
+# 라이센스 인증 화면
+if not st.session_state.authenticated:
+    st.title("🎓 코드스튜디오 입시연구소")
+    st.markdown("### 라이센스 인증이 필요합니다")
+    
+    licenses = check_license()
+    if licenses is None:
+        st.error("시스템 설정 오류: 관리자에게 문의하세요.")
+        st.stop()
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        license_key = st.text_input("라이센스 키를 입력하세요", 
+                                   type="password",
+                                   placeholder="예: RFKX-ZWWU-860D-A8MO")
+        
+        if st.button("확인", use_container_width=True, type="primary"):
+            if license_key:
+                # 라이센스 검증
+                valid = False
+                for license in licenses:
+                    if license["key"] == license_key:
+                        st.session_state.authenticated = True
+                        st.session_state.user = license["user"]
+                        valid = True
+                        st.success(f"✅ 환영합니다, {license['user']}님!")
+                        st.balloons()
+                        st.rerun()
+                        break
+                
+                if not valid:
+                    st.error("❌ 유효하지 않은 라이센스 키입니다.")
+            else:
+                st.warning("⚠️ 라이센스 키를 입력해주세요.")
+    
+    with st.expander("도움말"):
+        st.markdown("""
+        - 라이센스 키는 XXXX-XXXX-XXXX-XXXX 형식입니다
+        - 대소문자를 정확히 입력해주세요
+        - 문제가 있으면 관리자에게 문의하세요
+        """)
+    st.stop()
+
+# ===== 여기서부터는 기존 코드 그대로 =====
+
 # 제목
 st.title("🎓 코드스튜디오 입시연구소")
 st.markdown("### 2021~2025년 5개년 데이터 기반 맞춤 추천")
+
+# 우측 상단에 로그아웃 버튼
+col1, col2 = st.columns([10, 1])
+with col2:
+    if st.button("로그아웃"):
+        st.session_state.authenticated = False
+        st.session_state.user = None
+        st.rerun()
+
 st.markdown("---")
 
 # CSV 데이터 로드 (서버에 미리 업로드)
@@ -616,6 +684,7 @@ def main():
     with st.sidebar:
         st.header("📚 시스템 정보")
         st.info("5개년 데이터 기반 30개 대학 추천")
+        st.write(f"**사용자**: {st.session_state.user}")
     
     df = load_admissions_data()
     
