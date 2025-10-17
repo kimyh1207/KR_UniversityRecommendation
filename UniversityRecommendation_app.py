@@ -1,21 +1,4 @@
-# 페이지 설정
-st.set_page_config(
-    page_title="코드스튜디오 입시연구소",
-    page_icon="🎓",
-    layout="wide"
-)
-
-# 디버깅 정보 (임시)
-with st.expander("🔍 디버깅 정보"):
-    st.write("Secrets 확인:")
-    st.write("- Spreadsheet ID 존재:", "gsheets" in st.secrets and "spreadsheet_id" in st.secrets["gsheets"])
-    st.write("- Credentials 존재:", "gsheets" in st.secrets and "credentials" in st.secrets["gsheets"])
-    if "gsheets" in st.secrets:
-        st.write("- Spreadsheet ID:", st.secrets["gsheets"].get("spreadsheet_id", "없음"))
-        if "credentials" in st.secrets["gsheets"]:
-            st.write("- Service Account Email:", st.secrets["gsheets"]["credentials"].get("client_email", "없음"))
-
-# 세션 상태 초기화import streamlit as st
+import streamlit as st
 import pandas as pd
 import numpy as np
 import openpyxl
@@ -40,7 +23,7 @@ st.set_page_config(
 if 'authenticated' not in st.session_state:
     st.session_state.authenticated = False
     st.session_state.user = None
-    st.session_state.auth_time = None
+    st.session_state.license_key = None
 
 # 라이센스 체크 함수
 def check_license():
