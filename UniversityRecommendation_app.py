@@ -96,16 +96,15 @@ def test_google_sheets_connection():
         return False, f"알 수 없는 오류: {str(e)}"
 
 def log_user_activity(user, activity_type="login"):
-    """사용자 활동 로그 기록"""
+    """사용자 활동 로그 기록 - 실패해도 앱은 계속 실행"""
     try:
         client = get_gsheet_client()
         if not client:
-            st.warning("로그 기록 실패: 클라이언트 생성 불가")
+            # 로그만 남기고 계속 진행
             return False
             
         spreadsheet_id = st.secrets.get("gsheets", {}).get("spreadsheet_id")
         if not spreadsheet_id:
-            st.warning("로그 기록 실패: 스프레드시트 ID 없음")
             return False
             
         # 스프레드시트 열기
@@ -130,7 +129,7 @@ def log_user_activity(user, activity_type="login"):
         return True
         
     except Exception as e:
-        st.warning(f"로그 기록 중 오류 발생: {str(e)}")
+        # 오류가 나도 앱은 계속 실행
         return False
 
 # 라이센스 인증 화면
@@ -164,7 +163,8 @@ if not st.session_state.authenticated:
                         try:
                             log_user_activity(license["user"], "login")
                         except Exception as e:
-                            st.warning(f"로그 기록 실패 (앱은 정상 작동): {str(e)}")
+                            # 로그 실패해도 계속 진행
+                            pass
                         
                         st.success(f"✅ 환영합니다, {license['user']}님!")
                         st.balloons()
@@ -238,8 +238,11 @@ if st.checkbox("🔧 시스템 상태 확인 (관리자용)"):
 
 with col2:
     if st.button("로그아웃"):
-        # 로그아웃 로그 기록
-        log_user_activity(st.session_state.user, "logout")
+        # 로그아웃 로그 기록 시도 (실패해도 계속 진행)
+        try:
+            log_user_activity(st.session_state.user, "logout")
+        except:
+            pass
         
         st.session_state.authenticated = False
         st.session_state.user = None
@@ -936,8 +939,11 @@ def main():
             st.error("모든 정보를 입력해주세요.")
         else:
             with st.spinner("5개년 데이터를 분석하여 추천 중..."):
-                # 추천 활동 로그
-                log_user_activity(st.session_state.user, f"recommend_{hope_major}")
+                # 추천 활동 로그 시도 (실패해도 계속 진행)
+                try:
+                    log_user_activity(st.session_state.user, f"recommend_{hope_major}")
+                except:
+                    pass
                 
                 recommendations, filtered, error = find_recommendations(df, hope_major, student_grade)
                 
@@ -1007,7 +1013,7 @@ def main():
             st.session_state.get('filtered_df', None)
         )
         
-        # 다운로드 로그
+        # 다운로드 로그 시도 (실패해도 계속 진행)
         if st.download_button(
             "📥 엑셀 파일 다운로드",
             output_file,
@@ -1015,7 +1021,10 @@ def main():
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             use_container_width=True
         ):
-            log_user_activity(st.session_state.user, "download_excel")
+            try:
+                log_user_activity(st.session_state.user, "download_excel")
+            except:
+                pass
 
 if __name__ == "__main__":
     main()
