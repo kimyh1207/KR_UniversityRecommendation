@@ -150,7 +150,7 @@ if not st.session_state.authenticated:
                                    placeholder="예: RFKX-ZWWU-860D-A8MO")
         
         if st.button("확인", use_container_width=True, type="primary"):
-            if license_key:
+                            if license_key:
                 # 라이센스 검증
                 valid = False
                 for license in licenses:
@@ -160,8 +160,11 @@ if not st.session_state.authenticated:
                         st.session_state.license_key = license_key
                         valid = True
                         
-                        # 로그인 로그 기록
-                        log_user_activity(license["user"], "login")
+                        # 로그인 로그 기록 시도 (실패해도 계속 진행)
+                        try:
+                            log_user_activity(license["user"], "login")
+                        except Exception as e:
+                            st.warning(f"로그 기록 실패 (앱은 정상 작동): {str(e)}")
                         
                         st.success(f"✅ 환영합니다, {license['user']}님!")
                         st.balloons()
