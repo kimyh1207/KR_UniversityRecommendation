@@ -26,6 +26,21 @@ if 'authenticated' not in st.session_state:
     st.session_state.user = None
     st.session_state.auth_time = None
 
+# check_and_activate_license 함수 시작 부분에 추가
+def check_and_activate_license(license_key, user_name):
+    """Google Sheets를 사용한 배타적 라이센스 확인 및 활성화"""
+    try:
+        st.write("1. Google Sheets 연결 시도...")  # 디버깅
+        client = get_gsheet_client()
+        if not client:
+            return False, "Google Sheets 연결 실패"
+        
+        st.write("2. 시트 열기...")  # 디버깅
+        sheet = client.open_by_key(st.secrets["gsheets"]["spreadsheet_id"]).sheet1
+        st.write("3. 시트 연결 성공!")  # 디버깅
+        
+        # ... 나머지 코드
+
 # 라이센스 체크 함수
 def check_license():
     """라이센스 확인"""
