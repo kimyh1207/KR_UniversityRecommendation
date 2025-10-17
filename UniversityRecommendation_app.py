@@ -65,33 +65,7 @@ def check_license():
     except KeyError:
         return None
     
-# ===============================
-# ✅ Google Sheets 연결 함수 추가
-# ===============================
-def get_gsheet_client():
-    """Streamlit secrets 기반 Google Sheets 클라이언트 생성"""
-    try:
-        import gspread
-        from google.oauth2.service_account import Credentials
-
-        # Streamlit Secrets에서 인증 정보 불러오기
-        creds_dict = st.secrets["gsheets"]["credentials"]
-        scopes = [
-            "https://www.googleapis.com/auth/spreadsheets",
-            "https://www.googleapis.com/auth/drive"
-        ]
-
-        # Credentials 객체 생성
-        creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
-
-        # gspread 클라이언트 생성
-        client = gspread.authorize(creds)
-        return client
-
-    except Exception as e:
-        st.error(f"❌ Google Sheets 인증 오류: {str(e)}")
-        return None
-
+    
 
 # 라이센스 인증 화면
 if not st.session_state.authenticated:
