@@ -1,4 +1,21 @@
-import streamlit as st
+# 페이지 설정
+st.set_page_config(
+    page_title="코드스튜디오 입시연구소",
+    page_icon="🎓",
+    layout="wide"
+)
+
+# 디버깅 정보 (임시)
+with st.expander("🔍 디버깅 정보"):
+    st.write("Secrets 확인:")
+    st.write("- Spreadsheet ID 존재:", "gsheets" in st.secrets and "spreadsheet_id" in st.secrets["gsheets"])
+    st.write("- Credentials 존재:", "gsheets" in st.secrets and "credentials" in st.secrets["gsheets"])
+    if "gsheets" in st.secrets:
+        st.write("- Spreadsheet ID:", st.secrets["gsheets"].get("spreadsheet_id", "없음"))
+        if "credentials" in st.secrets["gsheets"]:
+            st.write("- Service Account Email:", st.secrets["gsheets"]["credentials"].get("client_email", "없음"))
+
+# 세션 상태 초기화import streamlit as st
 import pandas as pd
 import numpy as np
 import openpyxl
@@ -7,6 +24,10 @@ from io import BytesIO
 import os
 import re
 from datetime import datetime, timedelta
+import gspread
+from google.oauth2.service_account import Credentials
+import hashlib
+import time
 
 # 페이지 설정
 st.set_page_config(
@@ -15,17 +36,11 @@ st.set_page_config(
     layout="wide"
 )
 
-# 페이지 설정 바로 다음에 추가
-st.write("Secrets 로드 테스트:")
-st.write("Spreadsheet ID:", st.secrets.get("gsheets", {}).get("spreadsheet_id", "없음"))
-st.write("Credentials type:", st.secrets.get("gsheets", {}).get("credentials", {}).get("type", "없음"))
-
 # 세션 상태 초기화
 if 'authenticated' not in st.session_state:
     st.session_state.authenticated = False
     st.session_state.user = None
     st.session_state.auth_time = None
-
 
 # 라이센스 체크 함수
 def check_license():
@@ -951,7 +966,7 @@ def main():
         st.download_button(
             "📥 엑셀 파일 다운로드",
             output_file,
-            f"대학추천_{st.session_state['student_info']['name']} by CodeStudio.xlsx",
+            f"대학추천_{st.session_state['student_info']['name']}_{len(st.session_state['recommendations'])}개.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             use_container_width=True
         )
