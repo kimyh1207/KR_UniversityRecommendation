@@ -7,3 +7,33 @@ google-auth
 google-auth-oauthlib
 google-auth-httplib2
 chardet
+
+
+## 설치 및 설정
+
+### 1. 필요 패키지 설치
+```bash
+pip install -r requirements.txt
+```
+
+### 2. 환경 설정
+1. `.streamlit` 폴더 생성
+2. `secrets.toml` 파일을 `.streamlit` 폴더에 생성
+3. 실제 라이센스 키와 Google Sheets 인증 정보 입력
+
+### 3. 실행
+```bash
+streamlit run UniversityRecommendation_app.py
+```
+```
+
+3. **폴더 구조 (최종):**
+```
+KR_UniversityRecommendation/
+├── UniversityRecommendation_app.py
+├── 2025_2021_result.csv
+├── README.md
+├── requirements.txt
+├── .gitignore
+└── .streamlit/
+    └── secrets.toml.example  (예시 파일)
