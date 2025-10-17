@@ -116,6 +116,32 @@ st.markdown("### 2021~2025년 5개년 데이터 기반 맞춤 추천")
 
 # 우측 상단에 로그아웃 버튼
 col1, col2 = st.columns([10, 1])
+
+# Google Sheets 연결 테스트 (임시 디버깅용)
+if st.checkbox("🔧 Google Sheets 연결 상태 확인"):
+    try:
+        st.write("1. 라이센스 키:", st.session_state.get('license_key', 'None'))
+        
+        client = get_gsheet_client()
+        if client:
+            st.success("✅ Google Sheets 클라이언트 생성 성공")
+            
+            sheet = client.open_by_key(st.secrets["gsheets"]["spreadsheet_id"]).sheet1
+            st.success("✅ 스프레드시트 연결 성공")
+            
+            all_values = sheet.get_all_values()
+            st.write(f"현재 데이터 행 수: {len(all_values)}")
+            if all_values:
+                st.write("헤더:", all_values[0])
+                if len(all_values) > 1:
+                    st.write("마지막 행:", all_values[-1])
+        else:
+            st.error("❌ Google Sheets 클라이언트 생성 실패")
+    except Exception as e:
+        st.error(f"❌ 연결 오류: {str(e)}")
+
+
+
 with col2:
     if st.button("로그아웃"):
         st.session_state.authenticated = False
