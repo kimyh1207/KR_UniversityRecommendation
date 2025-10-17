@@ -7,8 +7,6 @@ from io import BytesIO
 import os
 import re
 from datetime import datetime, timedelta
-import gspread
-from google.oauth2.service_account import Credentials
 import hashlib
 import time
 import json
@@ -36,64 +34,12 @@ def check_license():
         return None
 
 def get_gsheet_client():
-    """Google Sheets 클라이언트 생성"""
-    try:
-        # secrets에서 credentials 정보 가져오기
-        creds_info = dict(st.secrets["gsheets"]["credentials"])
-        
-        # private_key의 줄바꿈 처리
-        if 'private_key' in creds_info:
-            creds_info['private_key'] = creds_info['private_key'].replace('\\n', '\n')
-        
-        # Credentials 객체 생성
-        creds = Credentials.from_service_account_info(
-            creds_info,
-            scopes=[
-                "https://www.googleapis.com/auth/spreadsheets",
-                "https://www.googleapis.com/auth/drive",
-            ],
-        )
-        
-        # gspread 클라이언트 생성
-        client = gspread.authorize(creds)
-        return client
-        
-    except Exception as e:
-        st.error(f"Google Sheets 클라이언트 생성 실패: {str(e)}")
-        return None
+    """Google Sheets 클라이언트 생성 - 비활성화"""
+    return None
 
 def test_google_sheets_connection():
-    """Google Sheets 연결 테스트 함수"""
-    try:
-        client = get_gsheet_client()
-        if not client:
-            return False, "클라이언트 생성 실패"
-        
-        # 스프레드시트 ID 확인
-        spreadsheet_id = st.secrets.get("gsheets", {}).get("spreadsheet_id")
-        if not spreadsheet_id:
-            return False, "스프레드시트 ID가 설정되지 않았습니다"
-        
-        # 스프레드시트 열기 시도
-        sheet = client.open_by_key(spreadsheet_id)
-        worksheet = sheet.get_worksheet(0)  # 첫 번째 워크시트
-        
-        # 테스트로 A1 셀 읽기
-        test_value = worksheet.get('A1')
-        
-        return True, "연결 성공"
-        
-    except gspread.exceptions.SpreadsheetNotFound:
-        return False, "스프레드시트를 찾을 수 없습니다. ID를 확인하세요."
-    except gspread.exceptions.APIError as e:
-        if e.response.status_code == 403:
-            return False, "권한이 없습니다. 서비스 계정에 스프레드시트 접근 권한을 부여하세요."
-        elif e.response.status_code == 404:
-            return False, "스프레드시트를 찾을 수 없습니다. ID를 확인하세요."
-        else:
-            return False, f"API 오류: {e.response.status_code} - {e.response.text}"
-    except Exception as e:
-        return False, f"알 수 없는 오류: {str(e)}"
+    """Google Sheets 연결 테스트 함수 - 비활성화"""
+    return False, "Google Sheets 기능이 비활성화되었습니다."
 
 def log_user_activity(user, activity_type="login"):
     """사용자 활동 로그 기록 - 실패해도 앱은 계속 실행"""
@@ -193,48 +139,8 @@ st.markdown("### 2021~2025년 5개년 데이터 기반 맞춤 추천")
 # 우측 상단에 로그아웃 버튼
 col1, col2 = st.columns([10, 1])
 
-# Google Sheets 연결 테스트 (관리자용)
-if st.checkbox("🔧 시스템 상태 확인 (관리자용)"):
-    st.subheader("Google Sheets 연결 상태")
-    
-    # 연결 테스트
-    success, message = test_google_sheets_connection()
-    
-    if success:
-        st.success(f"✅ {message}")
-        
-        # 추가 정보 표시
-        try:
-            client = get_gsheet_client()
-            spreadsheet_id = st.secrets.get("gsheets", {}).get("spreadsheet_id")
-            sheet = client.open_by_key(spreadsheet_id)
-            
-            st.info(f"""
-            **연결 정보:**
-            - 스프레드시트 ID: {spreadsheet_id}
-            - 워크시트 수: {len(sheet.worksheets())}
-            - 서비스 계정: {st.secrets["gsheets"]["credentials"]["client_email"]}
-            """)
-            
-            # 워크시트 목록
-            st.write("**워크시트 목록:**")
-            for ws in sheet.worksheets():
-                st.write(f"- {ws.title}")
-                
-        except Exception as e:
-            st.error(f"상세 정보 조회 실패: {str(e)}")
-    else:
-        st.error(f"❌ {message}")
-        
-        # 해결 방법 안내
-        st.info("""
-        **해결 방법:**
-        1. Google Sheets에서 스프레드시트를 열어주세요
-        2. 공유 버튼 클릭
-        3. 다음 이메일 추가: `google-sheets-api@stoked-name-475406-h9.iam.gserviceaccount.com`
-        4. '편집자' 권한 부여
-        5. 완료 후 페이지 새로고침
-        """)
+# Google Sheets 연결 테스트 (관리자용) - 제거됨
+# 이 부분을 완전히 제거하여 오류 방지
 
 with col2:
     if st.button("로그아웃"):
