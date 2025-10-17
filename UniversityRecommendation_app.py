@@ -15,6 +15,11 @@ st.set_page_config(
     layout="wide"
 )
 
+# 페이지 설정 바로 다음에 추가
+st.write("Secrets 로드 테스트:")
+st.write("Spreadsheet ID:", st.secrets.get("gsheets", {}).get("spreadsheet_id", "없음"))
+st.write("Credentials type:", st.secrets.get("gsheets", {}).get("credentials", {}).get("type", "없음"))
+
 # 세션 상태 초기화
 if 'authenticated' not in st.session_state:
     st.session_state.authenticated = False
