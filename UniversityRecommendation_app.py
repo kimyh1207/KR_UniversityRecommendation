@@ -683,9 +683,10 @@ def create_excel_output(student_info, recommendations, all_results_df=None):
             ws2['G1'] = "70%컷"
             
             for col in ['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1']:
-                ws2[col].fill = header_fill
-                ws2[col].font = header_font
-                ws2[col].alignment = Alignment(horizontal='center', vertical='center')
+                ws2[col].fill = orange_fill
+                ws2[col].font = white_font
+                ws2[col].alignment = center_align
+                ws2[col].border = thin_border
             
             # 데이터 입력
             row_idx = 2
@@ -911,7 +912,7 @@ def main():
         st.download_button(
             "📥 엑셀 파일 다운로드",
             output_file,
-            f"대학추천_{st.session_state['student_info']['name']}_by_COdeStudio.xlsx",
+            f"대학추천_{st.session_state['student_info']['name']}by_COdeStudio.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             use_container_width=True
         )
