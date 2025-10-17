@@ -34,6 +34,19 @@ def check_license():
     except KeyError:
         return None
 
+def get_gsheet_client():
+    import gspread
+    from google.oauth2.service_account import Credentials
+    creds = Credentials.from_service_account_info(
+        st.secrets["gsheets"]["credentials"],
+        scopes=[
+            "https://www.googleapis.com/auth/spreadsheets",
+            "https://www.googleapis.com/auth/drive",
+        ],
+    )
+    return gspread.authorize(creds)
+
+
 # 시import streamlit as st
 import pandas as pd
 import numpy as np
