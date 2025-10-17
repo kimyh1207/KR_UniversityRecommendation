@@ -6,6 +6,7 @@ from openpyxl import load_workbook
 from io import BytesIO
 import os
 import re
+from datetime import datetime, timedelta
 
 # 페이지 설정
 st.set_page_config(
@@ -18,6 +19,38 @@ st.set_page_config(
 if 'authenticated' not in st.session_state:
     st.session_state.authenticated = False
     st.session_state.user = None
+    st.session_state.auth_time = None
+
+# 라이센스 체크 함수
+def check_license():
+    """라이센스 확인"""
+    try:
+        licenses = st.secrets["licenses"]
+        return licenses
+    except KeyError:
+        return None
+
+# 시import streamlit as st
+import pandas as pd
+import numpy as np
+import openpyxl
+from openpyxl import load_workbook
+from io import BytesIO
+import os
+import re
+
+# 페이지 설정
+st.set_page_config(
+    page_title="코드스튜디오 입시연구소",
+    page_icon="🎓",
+    layout="wide"
+)
+
+# 세션 상태 초기화
+if 'authenticated' not in st.session_state:
+    st.session_state.authenticated = False
+    st.session_state.user = None
+    st.session_state.auth_time = None
 
 # 라이센스 체크 함수
 def check_license():
@@ -912,7 +945,7 @@ def main():
         st.download_button(
             "📥 엑셀 파일 다운로드",
             output_file,
-            f"대학추천_{st.session_state['student_info']['name']}_by_COdeStudio.xlsx",
+            f"대학추천_{st.session_state['student_info']['name']}_{len(st.session_state['recommendations'])}개.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             use_container_width=True
         )
