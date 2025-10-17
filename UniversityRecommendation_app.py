@@ -125,39 +125,36 @@ def read_student_info_from_excel(excel_file):
         st.info(f"📋 엑셀 시트 목록: {wb.sheetnames}")
         
         # 내신분석 시트에서 정보 추출
-        if '내신분석' in wb.sheetnames:
-            ws = wb['내신분석']
+        if 'Index' in wb.sheetnames:
+            ws = wb['Index']
             
             # 여러 위치 시도
-            # 학교명: E1, E2
-            school_name = ws['E1'].value or ws['E2'].value
+            # 학교명: F4, F5
+            school_name = ws['F4'].value or ws['F5'].value
             
             # 학년: H1, H2
-            grade = ws['H1'].value or ws['H2'].value
+            grade = ws['I4'].value or ws['I5'].value
             
             # 이름: J1, J2, I1, I2, K1, K2 (여러 위치 시도)
-            student_name = (ws['J1'].value or ws['J2'].value or 
-                          ws['I1'].value or ws['I2'].value or
-                          ws['K1'].value or ws['K2'].value)
+            student_name = (ws['K4'].value or ws['K5'].value or 
+                          ws['L4'].value or ws['L5'].value )
             
             # 디버깅: 더 많은 셀 확인
             with st.expander("🔍 엑셀 셀 값 상세 확인"):
                 debug_info = {
                     '학교명': {
-                        'E1': ws['E1'].value,
-                        'E2': ws['E2'].value,
+                        'F4': ws['F4'].value,
+                        'F5': ws['F5'].value,
                     },
                     '학년': {
-                        'H1': ws['H1'].value,
-                        'H2': ws['H2'].value,
+                        'I4': ws['I4'].value,
+                        'I5': ws['I5'].value,
                     },
                     '이름': {
-                        'I1': ws['I1'].value,
-                        'I2': ws['I2'].value,
-                        'J1': ws['J1'].value,
-                        'J2': ws['J2'].value,
-                        'K1': ws['K1'].value,
-                        'K2': ws['K2'].value,
+                        'K4': ws['K4'].value,
+                        'K5': ws['K5'].value,
+                        'L4': ws['L4'].value,
+                        'L5': ws['L5'].value,
                     }
                 }
                 st.json(debug_info)
