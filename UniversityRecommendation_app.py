@@ -805,7 +805,8 @@ def main():
             "📥 엑셀 파일 다운로드",
             output_file,
             # f"대학추천_{st.session_state['student_info']['name']}_{len(st.session_state['recommendations'])}개.xlsx",
-            f"대학추천_{st.session_state['student_info']['name']_by_코드스튜디오}.xlsx",
+            # f"대학추천_{st.session_state['student_info']['name']_by_코드스튜디오}.xlsx",
+            f"대학추천_{st.session_state['student_info']['name']} by Code_Studio.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             use_container_width=True
         )
